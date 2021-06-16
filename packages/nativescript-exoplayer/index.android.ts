@@ -319,7 +319,8 @@ export class Video extends VideoBase {
 			try {
 				if (this._subtitlesSrc != null && this._subtitlesSrc.trim() != '') {
 					var subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());
-					var textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null, com.google.android.exoplayer2.util.MimeTypes.APPLICATION_SUBRIP, null, com.google.android.exoplayer2.Format.NO_VALUE, com.google.android.exoplayer2.Format.NO_VALUE, 'en', null);
+					var subType = this._detectSubtitleTypeFromSrc(subtitleUri);
+					var textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null, subType, com.google.android.exoplayer2.C.SELECTION_FLAG_DEFAULT, null);
 					var subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource(subtitleUri, dsf, textFormat, com.google.android.exoplayer2.C.TIME_UNSET);
 					var mergedArray = Array.create(com.google.android.exoplayer2.source.MediaSource, 2);
 					mergedArray[0] = vs;
@@ -343,6 +344,17 @@ export class Video extends VideoBase {
 			}
 		} catch (ex) {
 			console.log('Error:', ex, ex.stack);
+		}
+	}
+	_detectSubtitleTypeFromSrc(uri) {
+		var mimeTypes = com.google.android.exoplayer2.util.MimeTypes;
+		var path = uri.getPath();
+		var extension = path.substring(path.lastIndexOf('.') + 1);
+		switch (extension) {
+			case 'vtt':
+				return mimeTypes.TEXT_VTT;
+			case 'srt':
+				return mimeTypes.APPLICATION_SUBRIP;
 		}
 	}
 	_setNativeVideo(nativeVideo) {
@@ -384,8 +396,8 @@ export class Video extends VideoBase {
 	}
 	mute(mute) {
 		if (this.player) {
-      this.player.setVolume(mute ? 0 : 1);
-    }
+			this.player.setVolume(mute ? 0 : 1);
+		}
 	}
 	stop() {
 		if (this.player) {
