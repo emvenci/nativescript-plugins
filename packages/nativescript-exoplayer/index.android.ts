@@ -294,14 +294,11 @@ export class Video extends VideoBase {
 			}
 			try {
 				if (this._subtitlesSrc != null && this._subtitlesSrc.trim() != '') {
-					const subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());
-					const subtitleConfig = new ep2.MediaItem.SubtitleConfiguration.Builder(subtitleUri)
-						.setMimeType(ep2.util.MimeTypes.APPLICATION_SUBRIP)
-						.setLanguage('en')
-						.build();
-					const subtitlesSrc = new ep2.source.SingleSampleMediaSource.Factory(dsf)
-						.createMediaSource(subtitleConfig, ep2.C.TIME_UNSET);
-					const mergedArray = Array.create(ep2.source.MediaSource, 2);
+					var subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());
+					var subType = this._detectSubtitleTypeFromSrc(subtitleUri);
+					var textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null, subType, com.google.android.exoplayer2.C.SELECTION_FLAG_DEFAULT, null);
+					var subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource(subtitleUri, dsf, textFormat, com.google.android.exoplayer2.C.TIME_UNSET);
+					var mergedArray = Array.create(com.google.android.exoplayer2.source.MediaSource, 2);
 					mergedArray[0] = vs;
 					mergedArray[1] = subtitlesSrc;
 					vs = new ep2.source.MergingMediaSource(mergedArray);
@@ -323,6 +320,18 @@ export class Video extends VideoBase {
 			}
 		} catch (ex) {
 			console.log('Error:', ex, ex.stack);
+		}
+	}
+
+	_detectSubtitleTypeFromSrc(uri) {
+		var mimeTypes = com.google.android.exoplayer2.util.MimeTypes;
+		var path = uri.getPath();
+		var extension = path.substring(path.lastIndexOf('.') + 1);
+		switch (extension) {
+			case 'vtt':
+				return mimeTypes.TEXT_VTT;
+			case 'srt':
+				return mimeTypes.APPLICATION_SUBRIP;
 		}
 	}
 
