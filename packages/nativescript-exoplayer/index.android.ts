@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 
-import { Video as VideoBase, VideoFill, videoSourceProperty, subtitleSourceProperty  } from './common';
+import { Video as VideoBase, VideoFill, videoSourceProperty, subtitleSourceProperty } from './common';
 import { Application, Utils } from '@nativescript/core';
 import ep2 = com.google.android.exoplayer2;
 
@@ -11,8 +11,8 @@ const SURFACE_WAITING: number = 0;
 const SURFACE_READY: number = 1;
 
 export class Video extends VideoBase {
-	private _textureView: android.widget.VideoView
-	private _subtitlesView: ep2.ui.SubtitleView
+	private _textureView: android.widget.VideoView;
+	private _subtitlesView: ep2.ui.SubtitleView;
 	private videoWidth: number;
 	private videoHeight: number;
 	private _src: string | ep2.source.MediaSource | any;
@@ -35,7 +35,7 @@ export class Video extends VideoBase {
 	private _resumeOnFocusGain = false;
 	private enableSubtitles: boolean = false;
 
-	public TYPE = {DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4};
+	public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
 	public nativeView: ep2.ui.PlayerView;
 	public player: ep2.ExoPlayer;
 
@@ -45,7 +45,7 @@ export class Video extends VideoBase {
 		this._boundStop = this.suspendEvent.bind(this);
 		this._resumeOnFocusGain = false;
 		this.enableSubtitles = false;
-		this.TYPE = {DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4};
+		this.TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
 		this._textureView = null;
 		this.nativeView = null;
 		this.videoWidth = 0;
@@ -108,18 +108,42 @@ export class Video extends VideoBase {
 	_setupMediaPlayerListeners = function () {
 		const that = new WeakRef(this);
 		const playerListener = new ep2.Player.Listener({
-			onEvents: function (_player: ep2.Player, _events: ep2.Player.Events): void { /* required in listener implementation */ },
-			onTimelineChanged: function (_timeline: ep2.Timeline, _manifest: number): void { /* required in listener implementation */ },
-			onMediaItemTransition: function (_mediaItem: ep2.MediaItem, _reason: number): void { /* required in listener implementation */ },
-			onTracksChanged: function (_trackGroups: ep2.source.TrackGroupArray, _trackSelections: ep2.trackselection.TrackSelectionArray): void { /* required in listener implementation */ },
-			onTracksInfoChanged: function (_tracksInfo: ep2.TracksInfo): void { /* required in listener implementation */ },
-			onMediaMetadataChanged: function (_mediaMetadata: ep2.MediaMetadata): void { /* required in listener implementation */ },
-			onPlaylistMetadataChanged: function (_mediaMetadata: ep2.MediaMetadata): void { /* required in listener implementation */ },
-			onIsLoadingChanged: function (_isLoading: boolean): void { /* required in listener implementation */ },
-			onLoadingChanged: function (_isLoading: boolean): void { /* required in listener implementation */ },
-			onAvailableCommandsChanged: function (_availableCommands: ep2.Player.Commands): void { /* required in listener implementation */ },
-			onTrackSelectionParametersChanged: function (_parameters: ep2.trackselection.TrackSelectionParameters): void { /* required in listener implementation */ },
-			onPlayerStateChanged: function (playWhenReady: boolean, playbackState: number): void { /* required in listener implementation */ },
+			onEvents: function (_player: ep2.Player, _events: ep2.Player.Events): void {
+				/* required in listener implementation */
+			},
+			onTimelineChanged: function (_timeline: ep2.Timeline, _manifest: number): void {
+				/* required in listener implementation */
+			},
+			onMediaItemTransition: function (_mediaItem: ep2.MediaItem, _reason: number): void {
+				/* required in listener implementation */
+			},
+			onTracksChanged: function (_trackGroups: ep2.source.TrackGroupArray, _trackSelections: ep2.trackselection.TrackSelectionArray): void {
+				/* required in listener implementation */
+			},
+			onTracksInfoChanged: function (_tracksInfo: ep2.TracksInfo): void {
+				/* required in listener implementation */
+			},
+			onMediaMetadataChanged: function (_mediaMetadata: ep2.MediaMetadata): void {
+				/* required in listener implementation */
+			},
+			onPlaylistMetadataChanged: function (_mediaMetadata: ep2.MediaMetadata): void {
+				/* required in listener implementation */
+			},
+			onIsLoadingChanged: function (_isLoading: boolean): void {
+				/* required in listener implementation */
+			},
+			onLoadingChanged: function (_isLoading: boolean): void {
+				/* required in listener implementation */
+			},
+			onAvailableCommandsChanged: function (_availableCommands: ep2.Player.Commands): void {
+				/* required in listener implementation */
+			},
+			onTrackSelectionParametersChanged: function (_parameters: ep2.trackselection.TrackSelectionParameters): void {
+				/* required in listener implementation */
+			},
+			onPlayerStateChanged: function (playWhenReady: boolean, playbackState: number): void {
+				/* required in listener implementation */
+			},
 			onPlaybackStateChanged: function (playbackState: number): void {
 				const owner = that.get();
 				if (!owner) {
@@ -158,36 +182,80 @@ export class Video extends VideoBase {
 					owner.eventPlaybackStart = true;
 				}
 			},
-			onPlaybackSuppressionReasonChanged: function (_playbackSuppressionReason: number): void { /* required in listener implementation */ },
-			onIsPlayingChanged: function (_isPlaying: boolean): void { /* required in listener implementation */ },
-			onRepeatModeChanged: function (_repeatMode: number): void { /* required in listener implementation */ },
-			onShuffleModeEnabledChanged: function (_shuffleModeEnabled: boolean): void { /* required in listener implementation */ },
+			onPlaybackSuppressionReasonChanged: function (_playbackSuppressionReason: number): void {
+				/* required in listener implementation */
+			},
+			onIsPlayingChanged: function (_isPlaying: boolean): void {
+				/* required in listener implementation */
+			},
+			onRepeatModeChanged: function (_repeatMode: number): void {
+				/* required in listener implementation */
+			},
+			onShuffleModeEnabledChanged: function (_shuffleModeEnabled: boolean): void {
+				/* required in listener implementation */
+			},
 			onPlayerError: function (error: ep2.PlaybackException): void {
 				console.error('PlayerError', error);
 			},
-			onPlayerErrorChanged: function (_error: ep2.PlaybackException): void { /* required in listener implementation */ },
-			onPositionDiscontinuity: function (_reasonOrOldPosition: number | ep2.Player.PositionInfo, _newPosition?: ep2.Player.PositionInfo, _reason?: number): void { /* required in listener implementation */ },
-			onPlaybackParametersChanged: function (_playbackParameters: ep2.PlaybackParameters): void { /* required in listener implementation */ },
-			onSeekBackIncrementChanged: function (_param0: number): void { /* required in listener implementation */ },
-			onSeekForwardIncrementChanged: function (_seekBackIncrementMs: number): void { /* required in listener implementation */ },
-			onMaxSeekToPreviousPositionChanged: function (_maxSeekToPreviousPositionMs: number): void { /* required in listener implementation */ },
-			onSeekProcessed: function (): void { /* required in listener implementation */ },
-			onAudioSessionIdChanged: function (_audioSessionId: number): void { /* required in listener implementation */ },
-			onAudioAttributesChanged: function (_audioAttributes: ep2.audio.AudioAttributes): void { /* required in listener implementation */ },
-			onVolumeChanged: function (_volume: number): void { /* required in listener implementation */ },
-			onSkipSilenceEnabledChanged: function (_skipSilenceEnabled: boolean): void { /* required in listener implementation */ },
-			onDeviceInfoChanged: function (_deviceInfo: ep2.DeviceInfo): void { /* required in listener implementation */ },
-			onDeviceVolumeChanged: function (_volume: number, _muted: boolean): void { /* required in listener implementation */ },
-			onVideoSizeChanged: function (_videoSize: ep2.video.VideoSize): void { /* required in listener implementation */ },
-			onSurfaceSizeChanged: function (_width: number, _height: number): void { /* required in listener implementation */ },
-			onRenderedFirstFrame: function (): void { /* required in listener implementation */ },
-			onCues: function (_cues: java.util.List<ep2.text.Cue>): void { /* required in listener implementation */ },
-			onMetadata: function (_metadata: ep2.metadata.Metadata): void { /* required in listener implementation */ },
+			onPlayerErrorChanged: function (_error: ep2.PlaybackException): void {
+				/* required in listener implementation */
+			},
+			onPositionDiscontinuity: function (_reasonOrOldPosition: number | ep2.Player.PositionInfo, _newPosition?: ep2.Player.PositionInfo, _reason?: number): void {
+				/* required in listener implementation */
+			},
+			onPlaybackParametersChanged: function (_playbackParameters: ep2.PlaybackParameters): void {
+				/* required in listener implementation */
+			},
+			onSeekBackIncrementChanged: function (_param0: number): void {
+				/* required in listener implementation */
+			},
+			onSeekForwardIncrementChanged: function (_seekBackIncrementMs: number): void {
+				/* required in listener implementation */
+			},
+			onMaxSeekToPreviousPositionChanged: function (_maxSeekToPreviousPositionMs: number): void {
+				/* required in listener implementation */
+			},
+			onSeekProcessed: function (): void {
+				/* required in listener implementation */
+			},
+			onAudioSessionIdChanged: function (_audioSessionId: number): void {
+				/* required in listener implementation */
+			},
+			onAudioAttributesChanged: function (_audioAttributes: ep2.audio.AudioAttributes): void {
+				/* required in listener implementation */
+			},
+			onVolumeChanged: function (_volume: number): void {
+				/* required in listener implementation */
+			},
+			onSkipSilenceEnabledChanged: function (_skipSilenceEnabled: boolean): void {
+				/* required in listener implementation */
+			},
+			onDeviceInfoChanged: function (_deviceInfo: ep2.DeviceInfo): void {
+				/* required in listener implementation */
+			},
+			onDeviceVolumeChanged: function (_volume: number, _muted: boolean): void {
+				/* required in listener implementation */
+			},
+			onVideoSizeChanged: function (_videoSize: ep2.video.VideoSize): void {
+				/* required in listener implementation */
+			},
+			onSurfaceSizeChanged: function (_width: number, _height: number): void {
+				/* required in listener implementation */
+			},
+			onRenderedFirstFrame: function (): void {
+				/* required in listener implementation */
+			},
+			onCues: function (_cues: java.util.List<ep2.text.Cue>): void {
+				/* required in listener implementation */
+			},
+			onMetadata: function (_metadata: ep2.metadata.Metadata): void {
+				/* required in listener implementation */
+			},
 		});
 		if (that.get().player) {
 			that.get().player.addListener(playerListener);
 		}
-	}
+	};
 
 	_setupMediaController() {
 		this.nativeView.setUseController(!!this.controls);
@@ -223,7 +291,6 @@ export class Video extends VideoBase {
 			this.startCurrentTimer();
 		}
 		this.videoOpened = true;
-
 
 		if (!this.backgroundAudio) {
 			const am: android.media.AudioManager = this._context.getSystemService(android.content.Context.AUDIO_SERVICE);
@@ -270,7 +337,7 @@ export class Video extends VideoBase {
 						vs = new ep2.source.ProgressiveMediaSource.Factory(dsf).createMediaSource(mediaItem);
 				}
 			} else if (typeof this._src.typeSource === 'number') {
-				const mediaItem = ep2.MediaItem.fromUri(android.net.Uri.parse(this._src.url))
+				const mediaItem = ep2.MediaItem.fromUri(android.net.Uri.parse(this._src.url));
 				switch (this._src.typeSource) {
 					case this.TYPE.SS:
 						vs = new ep2.source.smoothstreaming.SsMediaSource.Factory(dsf).createMediaSource(mediaItem);
@@ -290,12 +357,9 @@ export class Video extends VideoBase {
 			try {
 				if (this._subtitlesSrc != null && this._subtitlesSrc.trim() != '') {
 					const subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());
-					const subtitleConfig = new ep2.MediaItem.SubtitleConfiguration.Builder(subtitleUri)
-						.setMimeType(ep2.util.MimeTypes.APPLICATION_SUBRIP)
-						.setLanguage('en')
-						.build();
-					const subtitlesSrc = new ep2.source.SingleSampleMediaSource.Factory(dsf)
-						.createMediaSource(subtitleConfig, ep2.C.TIME_UNSET);
+					const subType = this._detectSubtitleTypeFromSrc(subtitleUri);
+					const subtitleConfig = new ep2.MediaItem.SubtitleConfiguration.Builder(subtitleUri).setMimeType(subType).setSelectionFlags(ep2.C.SELECTION_FLAG_DEFAULT).build();
+					const subtitlesSrc = new ep2.source.SingleSampleMediaSource.Factory(dsf).createMediaSource(subtitleConfig, ep2.C.TIME_UNSET);
 					const mergedArray = Array.create(ep2.source.MediaSource, 2);
 					mergedArray[0] = vs;
 					mergedArray[1] = subtitlesSrc;
@@ -310,7 +374,7 @@ export class Video extends VideoBase {
 			this._setupMediaPlayerListeners();
 			this.player.setMediaSource(vs);
 			if (this.autoplay === true) {
-        this.player.prepare();
+				this.player.prepare();
 				this.player.setPlayWhenReady(true);
 			}
 			if (this.preSeekTime > 0) {
@@ -319,6 +383,18 @@ export class Video extends VideoBase {
 			}
 		} catch (ex) {
 			console.log('Error:', ex, ex.stack);
+		}
+	}
+
+	_detectSubtitleTypeFromSrc(uri) {
+		const mimeTypes = ep2.util.MimeTypes;
+		const path = uri.getPath();
+		const extension = path.substring(path.lastIndexOf('.') + 1);
+		switch (extension) {
+			case 'vtt':
+				return mimeTypes.TEXT_VTT;
+			case 'srt':
+				return mimeTypes.APPLICATION_SUBRIP;
 		}
 	}
 
@@ -345,9 +421,9 @@ export class Video extends VideoBase {
 			this.eventPlaybackStart = false;
 			this.player.seekToDefaultPosition();
 		}
-    this.player.prepare();
-    this.player.setPlayWhenReady(true);
-    this.startCurrentTimer();
+		this.player.prepare();
+		this.player.setPlayWhenReady(true);
+		this.startCurrentTimer();
 	}
 
 	pause() {
@@ -366,8 +442,8 @@ export class Video extends VideoBase {
 		if (this.player) {
 			this.stopCurrentTimer();
 			this.player.stop();
-      this.player.seekToDefaultPosition();
-      // don't release the player, because this prevents the player internal action buttons
+			this.player.seekToDefaultPosition();
+			// don't release the player, because this prevents the player internal action buttons
 			this.release();
 		}
 	}
@@ -469,14 +545,14 @@ export class Video extends VideoBase {
 			this.nativeView.onResume();
 		}
 		//this._openVideo();
-		if(this._resumeOnFocusGain) {
+		if (this._resumeOnFocusGain) {
 			this._resumeOnFocusGain = false;
 			this.player.setPlayWhenReady(true);
 		}
 	}
 
 	startCurrentTimer() {
-		console.log("[EXOPLAYER] startCurrentTimer");
+		console.log('[EXOPLAYER] startCurrentTimer');
 		if (this.interval) {
 			return;
 		}
