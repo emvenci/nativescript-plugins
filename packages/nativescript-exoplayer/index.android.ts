@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 
-import { Video as VideoBase, VideoFill, videoSourceProperty, subtitleSourceProperty } from './common';
+import { Video as VideoBase, VideoFill, videoSourceProperty, subtitleSourceProperty, userTokenProperty, keyUrlProperty, urlIdentifierProperty } from './common';
 import { Application, Utils } from '@nativescript/core';
 import ep2 = com.google.android.exoplayer2;
 
@@ -17,6 +17,9 @@ export class Video extends VideoBase {
 	private videoHeight: number;
 	private _src: string | ep2.source.MediaSource | any;
 	private _subtitlesSrc: any;
+	private _userToken: string;
+	private _keyUrl: string;
+	private _urlIdentifier: string;
 	private mediaState: number;
 	private textureSurface: any;
 	private textureSurfaceSet: boolean;
@@ -80,6 +83,18 @@ export class Video extends VideoBase {
 
 	[subtitleSourceProperty.setNative](value) {
 		this._updateSubtitles(value ? value.android : null);
+	}
+
+	[userTokenProperty.setNative](value) {
+		this._updateUserToken(value ? value : null);
+	}
+
+	[keyUrlProperty.setNative](value) {
+		this._updateKeyUrl(value ? value : null);
+	}
+
+	[urlIdentifierProperty.setNative](value) {
+		this._updateUrlIdentifier(value ? value : null);
 	}
 
 	createNativeView() {
@@ -315,6 +330,38 @@ export class Video extends VideoBase {
 				this.nativeView.setResizeMode(ep2.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL);
 			}
 			const userAgent = ep2.util.Util.getUserAgent(this._context, Utils.ad.getApplicationContext().getPackageName());
+
+			const policy = new android.os.StrictMode.ThreadPolicy.Builder().permitAll().build();
+			android.os.StrictMode.setThreadPolicy(policy);
+
+			const keyUrl = this._keyUrl;
+			const token = this._userToken;
+			const flag = this._urlIdentifier;
+
+			if (keyUrl === undefined || token === undefined || flag === undefined) {
+				return;
+			}
+
+			const AppHttpInterceptorExo = okhttp3.Interceptor.extend({
+				intercept: function (chain) {
+					try {
+						var request = chain.request();
+						let url = request.url().toString();
+						if (url.includes(flag)) {
+							var newRequest = request.newBuilder().addHeader('Authorization', token).url(keyUrl).build();
+							return chain.proceed(newRequest);
+						}
+						return chain.proceed(request);
+					} catch (e) {
+						console.log(e);
+					}
+				},
+			});
+
+			const builderExo = new okhttp3.OkHttpClient.Builder();
+			builderExo.addInterceptor(new AppHttpInterceptorExo());
+			const dataSourceExo = new com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource.Factory(builderExo.build());
+
 			const dsf = new ep2.upstream.DefaultDataSourceFactory(this._context, userAgent, bm);
 			let vs: ep2.source.MediaSource;
 			if (this._src instanceof String || typeof this._src === 'string') {
@@ -329,7 +376,7 @@ export class Video extends VideoBase {
 						vs = new ep2.source.dash.DashMediaSource.Factory(dsf).createMediaSource(mediaItem);
 						break;
 					case this.TYPE.HLS:
-						vs = new ep2.source.hls.HlsMediaSource.Factory(dsf)
+						vs = new ep2.source.hls.HlsMediaSource.Factory(dataSourceExo)
 							// .setAllowChunklessPreparation(true)
 							.createMediaSource(mediaItem);
 						break;
@@ -346,7 +393,7 @@ export class Video extends VideoBase {
 						vs = new ep2.source.dash.DashMediaSource.Factory(dsf).createMediaSource(mediaItem);
 						break;
 					case this.TYPE.HLS:
-						vs = new ep2.source.hls.HlsMediaSource.Factory(dsf).setAllowChunklessPreparation(true).createMediaSource(mediaItem);
+						vs = new ep2.source.hls.HlsMediaSource.Factory(dataSourceExo).setAllowChunklessPreparation(true).createMediaSource(mediaItem);
 						break;
 					default:
 						vs = new ep2.source.ProgressiveMediaSource.Factory(dsf).createMediaSource(mediaItem);
@@ -412,6 +459,21 @@ export class Video extends VideoBase {
 			}
 			this._openVideo();
 		}
+	}
+
+	_updateUserToken(userToken) {
+		this._userToken = userToken;
+		this._openVideo();
+	}
+
+	_updateKeyUrl(keyUrl) {
+		this._keyUrl = keyUrl;
+		this._openVideo();
+	}
+
+	_updateUrlIdentifier(urlIdentifier) {
+		this._urlIdentifier = urlIdentifier;
+		this._openVideo();
 	}
 
 	play() {

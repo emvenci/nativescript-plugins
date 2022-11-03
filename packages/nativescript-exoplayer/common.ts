@@ -47,6 +47,27 @@ function onSubtitlesPropertyChanged(view, oldValue, newValue) {
 	}
 }
 
+function onUserTokenChange(view, oldValue, newValue) {
+	const video = view;
+	if (Utils.isString(newValue)) {
+		video.userToken = newValue;
+	}
+}
+
+function onKeyUrlChange(view, oldValue, newValue) {
+	const video = view;
+	if (Utils.isString(newValue)) {
+		video.keyUrl = newValue;
+	}
+}
+
+function onUrlIdentifierChange(view, oldValue, newValue) {
+	const video = view;
+	if (Utils.isString(newValue)) {
+		video.urlIdentifier = newValue;
+	}
+}
+
 function onImgSrcPropertyChanged(view, oldValue, newValue) {
 	const video = view;
 	let value = newValue;
@@ -110,6 +131,10 @@ export class Video extends View {
 	public fill: VideoFill = VideoFill.default;
 	public detectChapters: boolean = false;
 	public backgroundAudio: boolean = false;
+
+	public userToken: string;
+	public keyUrl: string;
+	public urlIdentifier: string;
 
 	public encryptionKey: string = null;
 	public encryptionIV: string = null;
@@ -224,3 +249,21 @@ export const fillProperty = new Property<Video, VideoFill>({
 	name: 'fill',
 });
 fillProperty.register(Video);
+
+export const userTokenProperty = new Property({
+	name: 'userToken',
+	valueChanged: onUserTokenChange,
+});
+userTokenProperty.register(Video);
+
+export const keyUrlProperty = new Property({
+	name: 'keyUrl',
+	valueChanged: onKeyUrlChange,
+});
+keyUrlProperty.register(Video);
+
+export const urlIdentifierProperty = new Property({
+	name: 'urlIdentifier',
+	valueChanged: onUrlIdentifierChange,
+});
+urlIdentifierProperty.register(Video);
