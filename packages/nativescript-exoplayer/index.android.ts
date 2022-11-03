@@ -4,6 +4,8 @@ import { Video as VideoBase, VideoFill, videoSourceProperty, subtitleSourcePrope
 import { Application, Utils } from '@nativescript/core';
 import ep2 = com.google.android.exoplayer2;
 
+declare let okhttp3: any;
+
 export * from './common';
 
 // States from Exo Player
