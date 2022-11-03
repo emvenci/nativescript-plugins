@@ -26,6 +26,9 @@ export declare class Video extends View {
 	imgSrc: string;
 	imgType: number;
 	subtitles: string;
+	userToken: string;
+	keyUrl: string;
+	urlIdentifier: string;
 	subtitleSource: string;
 	observeCurrentTime: boolean;
 
@@ -60,12 +63,12 @@ export declare class Video extends View {
 	static IMAGETYPESTEREOTOPBOTTOM: number;
 	static IMAGETYPESTEREOLEFTRIGHT: number;
 
-  /**
-   * encryption parameters
-   */
-  public encryptionKey: string = null;
-  public encryptionIV: string = null;
-  public encryption: string = '';
+	/**
+	 * encryption parameters
+	 */
+	public encryptionKey: string = null;
+	public encryptionIV: string = null;
+	public encryption: string = '';
 
 	/**
 	 * Start playing the video.
