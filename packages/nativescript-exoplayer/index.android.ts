@@ -340,28 +340,31 @@ export class Video extends VideoBase {
 			const token = this._userToken;
 			const flag = this._urlIdentifier;
 
-			if (keyUrl === undefined || token === undefined || flag === undefined) {
+			if (!keyUrl || !token || !flag) {
 				return;
 			}
 
-			const AppHttpInterceptorExo = okhttp3.Interceptor.extend({
-				intercept: function (chain) {
-					try {
-						var request = chain.request();
-						let url = request.url().toString();
-						if (url.includes(flag)) {
-							var newRequest = request.newBuilder().addHeader('Authorization', token).url(keyUrl).build();
-							return chain.proceed(newRequest);
-						}
-						return chain.proceed(request);
-					} catch (e) {
-						console.log(e);
-					}
-				},
-			});
+			// Using a function to create the interceptor, securing that the keyUrl is updated for each video
+            const createInterceptor = (keyUrl, token, flag) => {
+                return new okhttp3.Interceptor({
+                    intercept: (chain) => {
+                        const request = chain.request();
+                        const url = request.url().toString();
+        
+                        if (url.includes(flag)) {
+                            const newRequest = request.newBuilder()
+                                .addHeader('Authorization', token)
+                                .url(keyUrl)
+                                .build();
+                            return chain.proceed(newRequest);
+                        }
+                        return chain.proceed(request);
+                    }
+                });
+            };
 
 			const builderExo = new okhttp3.OkHttpClient.Builder();
-			builderExo.addInterceptor(new AppHttpInterceptorExo());
+			builderExo.addInterceptor(createInterceptor(keyUrl, token, flag));
 			const dataSourceExo = new com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource.Factory(builderExo.build());
 
 			const dsf = new ep2.upstream.DefaultDataSourceFactory(this._context, userAgent, bm);
