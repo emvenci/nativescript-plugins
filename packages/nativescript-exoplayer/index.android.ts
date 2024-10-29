@@ -350,15 +350,34 @@ export class Video extends VideoBase {
                     intercept: (chain) => {
                         const request = chain.request();
                         const url = request.url().toString();
-        
-                        if (url.includes(flag)) {
-                            const newRequest = request.newBuilder()
-                                .addHeader('Authorization', token)
-                                .url(keyUrl)
-                                .build();
-                            return chain.proceed(newRequest);
-                        }
-                        return chain.proceed(request);
+                        try {
+							// Check if the URL contains the flag to apply the Authorization header
+							if (url.includes(flag)) {
+								const newRequest = request.newBuilder()
+									.addHeader('Authorization', token)
+									.url(keyUrl)
+									.build();
+								return chain.proceed(newRequest);
+							}
+							// Proceed without modification if flag is not present
+							return chain.proceed(request);
+						} catch (error) {
+							// Handle the error gracefully
+							console.error("Interceptor error:", error);
+			
+							// Optionally, create a custom response to return in case of an error
+							const response = new okhttp3.Response.Builder()
+								.request(request)
+								.protocol(okhttp3.Protocol.HTTP_1_1)
+								.code(500) // HTTP status code for server error
+								.message("Error in interceptor")
+								.body(okhttp3.ResponseBody.create(
+									okhttp3.MediaType.parse("text/plain"),
+									"An error occurred while processing the request"
+								))
+								.build();
+							return response;
+						}
                     }
                 });
             };
